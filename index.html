@@ -190,11 +190,17 @@
                     Papa.parse(csvText, {
                         header: true,
                         skipEmptyLines: true,
+                        // 【關鍵修正】在解析 CSV 時，對標題進行 trim() 處理，確保欄位名稱匹配準確
+                        transformHeader: function(header) {
+                            return header.trim();
+                        },
                         complete: function(results) {
-                            // 移除 Google Sheet 自動添加的時間戳記欄位，並過濾掉沒有主要資料的列
+                            
                             rawData = results.data
                                 .map(row => {
-                                    // 確保欄位名稱正確對應
+                                    // 確保欄位名稱正確對應 (現在 keys 已經被 transformHeader 清理過了)
+                                    // 注意：Google 表單導出的 CSV 第一個欄位通常是 '時間戳記'，但由於我們使用了 transformHeader
+                                    // 這裡可以直接使用我們預期的中文欄位名稱
                                     const {
                                         "發生日期": date,
                                         "發生時間": time,
@@ -212,6 +218,10 @@
                                     };
                                 })
                                 .filter(row => row.date && row.location); // 確保關鍵欄位有值
+                            
+                            if (rawData.length === 0) {
+                                displayError("資料已成功讀取，但未包含有效的回報數據。請檢查試算表內容。");
+                            }
 
                             resolve(rawData);
                         },
@@ -222,7 +232,7 @@
                 });
             } catch (error) {
                 console.error("資料獲取或解析錯誤:", error);
-                displayError(`無法載入或解析數據：${error.message}`);
+                displayError(`無法載入或解析數據：${error.message} (錯誤碼: ${error.message.includes('Failed to fetch') ? '網路/CORS' : '解析失敗'})`);
                 return [];
             } finally {
                 loadingOverlay.classList.add('hidden');
