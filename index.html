@@ -324,8 +324,7 @@
         // --- KPI 計算函數 ---
         const calculateKPIs = (data) => {
             const totalCount = data.length;
-            // 由於 normalizeDate 處理後的格式是 YYYY/MM/DD，這裡直接使用 date
-            const uniqueDates = new Set(data.map(row => row.date)); 
+            const uniqueDates = new Set(data.map(row => row.date));
             const heavyReports = data.filter(row => row.concentration === '重度').length;
 
             const heavyRatio = totalCount > 0 ? ((heavyReports / totalCount) * 100).toFixed(1) : 0;
@@ -354,17 +353,18 @@
                 }, {});
 
                 // 找出計數最多的時段
+                let peakHour24 = null;
                 Object.keys(hourCounts).filter(h => h !== '未知').forEach(hour => {
                     if (hourCounts[hour] > maxCount) {
                         maxCount = hourCounts[hour];
-                        
-                        // 將小時轉為數字後加 1，並處理 23 -> 0 的情況
-                        const nextHourInt = (parseInt(hour, 10) + 1) % 24;
-                        
-                        // 使用 12 小時制顯示時段
-                        peakHour = `${hourTo12hDisplay(hour)} - ${hourTo12hDisplay(nextHourInt)}`;
+                        peakHour24 = hour; // 記住 24 小時制的起始小時
                     }
                 });
+                
+                // 【優化點】：如果找到熱點，只顯示起始時間 + "(1小時)"
+                if (peakHour24 !== null) {
+                    peakHour = `${hourTo12hDisplay(peakHour24)} (1小時)`;
+                }
             }
             
             // 寫入 DOM
