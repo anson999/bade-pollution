@@ -191,7 +191,7 @@
             return `${y}/${m}/${d}`; 
         };
         
-        // 【關鍵修正】日期字串標準化函數：將各種格式的日期字串轉換為 YYYY/MM/DD 格式
+        // 日期字串標準化函數：將各種格式的日期字串轉換為 YYYY/MM/DD 格式
         const normalizeDate = (dateString) => {
             if (!dateString) return null;
             
@@ -239,7 +239,7 @@
                     Papa.parse(csvText, {
                         header: true,
                         skipEmptyLines: true,
-                        // 【關鍵修正】在解析 CSV 時，對標題進行 trim() 處理，確保欄位名稱匹配準確
+                        // 確保 CSV 標題被 trim() 處理，確保欄位名稱匹配準確
                         transformHeader: function(header) {
                             return header.trim();
                         },
@@ -270,7 +270,7 @@
                                 .map(row => {
                                     // 使用動態找到的 key 來提取數據並清除前後空格
                                     const rawDate = row[dateKey] ? String(row[dateKey]).trim() : null;
-                                    const date = normalizeDate(rawDate); // 【應用修正】標準化日期格式
+                                    const date = normalizeDate(rawDate); // 標準化日期格式
                                     const time = row[timeKey] ? String(row[timeKey]).trim() : null;
                                     const location = row[locationKey] ? String(row[locationKey]).trim() : null;
                                     const concentration = row[concentrationKey] ? String(row[concentrationKey]).trim() : null;
@@ -324,7 +324,8 @@
         // --- KPI 計算函數 ---
         const calculateKPIs = (data) => {
             const totalCount = data.length;
-            const uniqueDates = new Set(data.map(row => row.date));
+            // 由於 normalizeDate 處理後的格式是 YYYY/MM/DD，這裡直接使用 date
+            const uniqueDates = new Set(data.map(row => row.date)); 
             const heavyReports = data.filter(row => row.concentration === '重度').length;
 
             const heavyRatio = totalCount > 0 ? ((heavyReports / totalCount) * 100).toFixed(1) : 0;
@@ -339,36 +340,34 @@
 
 
             // 計算最常發生時段 (按小時)
-            const hourCounts = data.reduce((acc, row) => {
-                // 嘗試解析 HH:MM:SS 或 HH:MM 格式
-                const timePart = row.time ? row.time.split(':') : null;
-                const hour = timePart && timePart.length >= 2 ? timePart[0].padStart(2, '0') : '未知';
-                
-                acc[hour] = (acc[hour] || 0) + 1;
-                return acc;
-            }, {});
-
-            let peakHour = '--';
+            let peakHour = '--'; // 預設值
             let maxCount = 0;
-            // 找出計數最多的時段
-            Object.keys(hourCounts).filter(h => h !== '未知').forEach(hour => {
-                if (hourCounts[hour] > maxCount) {
-                    maxCount = hourCounts[hour];
-                    
-                    // 將小時轉為數字後加 1，並處理 23 -> 0 的情況
-                    const nextHourInt = (parseInt(hour, 10) + 1) % 24;
-                    
-                    // 使用 12 小時制顯示時段
-                    peakHour = `${hourTo12hDisplay(hour)} - ${hourTo12hDisplay(nextHourInt)}`;
-                }
-            });
             
-            // 如果數據是空的，保持 --
-            if (totalCount === 0) {
-                peakHour = '--';
+            if (totalCount > 0) {
+                const hourCounts = data.reduce((acc, row) => {
+                    // 嘗試解析 HH:MM:SS 或 HH:MM 格式
+                    const timePart = row.time ? row.time.split(':') : null;
+                    const hour = timePart && timePart.length >= 2 ? timePart[0].padStart(2, '0') : '未知';
+                    
+                    acc[hour] = (acc[hour] || 0) + 1;
+                    return acc;
+                }, {});
+
+                // 找出計數最多的時段
+                Object.keys(hourCounts).filter(h => h !== '未知').forEach(hour => {
+                    if (hourCounts[hour] > maxCount) {
+                        maxCount = hourCounts[hour];
+                        
+                        // 將小時轉為數字後加 1，並處理 23 -> 0 的情況
+                        const nextHourInt = (parseInt(hour, 10) + 1) % 24;
+                        
+                        // 使用 12 小時制顯示時段
+                        peakHour = `${hourTo12hDisplay(hour)} - ${hourTo12hDisplay(nextHourInt)}`;
+                    }
+                });
             }
-
-
+            
+            // 寫入 DOM
             document.getElementById('kpi-total').textContent = totalCount.toLocaleString();
             document.getElementById('kpi-days').textContent = uniqueDates.size.toLocaleString();
             document.getElementById('kpi-heavy-ratio').textContent = `${heavyRatio}%`;
@@ -386,7 +385,8 @@
         };
 
         const renderTypeChart = (data) => {
-            const typeCounts = data.reduce((acc, row => {
+            // 【關鍵修正】修正 reduce 函數的箭頭函數語法
+            const typeCounts = data.reduce((acc, row) => { 
                 const type = row.type || '未知異味';
                 acc[type] = (acc[type] || 0) + 1;
                 return acc;
@@ -453,7 +453,7 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: { beginAtZero: true, title: { display: true, text: '回報筆數' } },
-                        x: { title: { display: true, text: '時間 (12小時制)' } } // 【標題修改】
+                        x: { title: { display: true, text: '時間 (12小時制)' } } 
                     },
                     plugins: { legend: { display: false } }
                 }
@@ -504,7 +504,7 @@
             });
         };
 
-        // 【新圖表函數】近七日回報紀錄趨勢 (折線圖)
+        // 近七日回報紀錄趨勢 (折線圖)
         const renderWeeklyTrendChart = (data) => {
             // 1. 確定過去 7 天的日期 (包含今天)
             const today = new Date();
@@ -579,7 +579,6 @@
             renderTypeChart(data);
             renderTimeChart(data);
             renderLocationConcentrationChart(data);
-            // 【整合新圖表】
             renderWeeklyTrendChart(data); 
         };
 
