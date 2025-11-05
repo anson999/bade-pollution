@@ -224,6 +224,40 @@
             return dateString; // 解析失敗，返回原始字串
         };
 
+        // 【新修正】時間轉換函數：將 12 小時制 (如 3:00 PM) 或 24 小時制 (如 14:00) 轉換為 0-23 的小時整數
+        const convertTo24Hour = (timeString) => {
+            if (!timeString) return NaN;
+            
+            const trimmedTime = timeString.toUpperCase().trim();
+            
+            // 嘗試匹配 12-hour 格式: H:MM AM/PM, H:MM:SS AM/PM
+            const match12 = trimmedTime.match(/(\d{1,2}):\d{2}(:\d{2})?\s*(AM|PM)/);
+            
+            if (match12) {
+                let hour = parseInt(match12[1], 10);
+                const ampm = match12[3];
+
+                if (ampm === 'PM' && hour !== 12) {
+                    hour += 12; // 1 PM -> 13, 11 PM -> 23
+                } else if (ampm === 'AM' && hour === 12) {
+                    hour = 0; // 12 AM (midnight) -> 0
+                }
+                return hour; // 0-23
+            } 
+            
+            // 嘗試匹配 24-hour 格式: HH:MM, HH:MM:SS (例如 14:30)
+            const match24 = trimmedTime.match(/(\d{1,2}):\d{2}/);
+            
+            if (match24) {
+                const hour = parseInt(match24[1], 10);
+                if (hour >= 0 && hour <= 23) {
+                    return hour;
+                }
+            }
+            
+            return NaN; // 解析失敗
+        };
+
 
         // --- 資料獲取與解析 (使用 PapaParse) ---
         const fetchData = async () => {
@@ -275,13 +309,16 @@
                                     const location = row[locationKey] ? String(row[locationKey]).trim() : null;
                                     const concentration = row[concentrationKey] ? String(row[concentrationKey]).trim() : null;
                                     const type = row[typeKey] ? String(row[typeKey]).trim() : null;
+                                    
+                                    // 【修正】在此處預先轉換為 24 小時制的小時數
+                                    const hour24 = convertTo24Hour(time);
 
-                                    return { date, time, location, concentration, type };
+                                    return { date, time, location, concentration, type, hour24 };
                                 })
-                                .filter(row => row.date && row.location); // 確保關鍵欄位有值
+                                .filter(row => row.date && row.location && !isNaN(row.hour24)); // 確保關鍵欄位和 hour24 有效
                             
                             if (rawData.length === 0) {
-                                displayError("資料已成功讀取，但未包含有效的回報數據。請檢查試算表內容是否至少有一筆完整的日期和位置資訊。");
+                                displayError("資料已成功讀取，但未包含有效的回報數據。請檢查試算表內容是否至少有一筆完整的日期、位置和時間資訊。");
                             }
 
                             resolve(rawData);
@@ -332,8 +369,22 @@
             // 12小時制時間格式化 helper
             const hourTo12hDisplay = (h24) => {
                 const hour = parseInt(h24, 10);
-                const suffix = hour >= 12 ? ' PM' : ' AM';
-                const hour12 = hour % 12 || 12; // 0點顯示為 12 AM
+                let hour12;
+                let suffix;
+
+                if (hour === 0) {
+                    hour12 = 12; // 0點是 12 AM
+                    suffix = ' AM';
+                } else if (hour < 12) {
+                    hour12 = hour;
+                    suffix = ' AM';
+                } else if (hour === 12) {
+                    hour12 = 12;
+                    suffix = ' PM';
+                } else { // hour > 12
+                    hour12 = hour - 12;
+                    suffix = ' PM';
+                }
                 return `${hour12.toString()}${suffix}`;
             };
 
@@ -344,24 +395,26 @@
             
             if (totalCount > 0) {
                 const hourCounts = data.reduce((acc, row) => {
-                    // 嘗試解析 HH:MM:SS 或 HH:MM 格式
-                    const timePart = row.time ? row.time.split(':') : null;
-                    const hour = timePart && timePart.length >= 2 ? timePart[0].padStart(2, '0') : '未知';
+                    // 【修正】直接使用預先計算好的 24 小時制小時數
+                    const hour = row.hour24;
                     
-                    acc[hour] = (acc[hour] || 0) + 1;
+                    if (!isNaN(hour)) {
+                         acc[hour] = (acc[hour] || 0) + 1;
+                    }
                     return acc;
                 }, {});
 
                 // 找出計數最多的時段
                 let peakHour24 = null;
-                Object.keys(hourCounts).filter(h => h !== '未知').forEach(hour => {
-                    if (hourCounts[hour] > maxCount) {
-                        maxCount = hourCounts[hour];
+                Object.keys(hourCounts).forEach(hour => {
+                    const count = hourCounts[hour];
+                    if (count > maxCount) {
+                        maxCount = count;
                         peakHour24 = hour; // 記住 24 小時制的起始小時
                     }
                 });
                 
-                // 【優化點】：如果找到熱點，只顯示起始時間 + "(1小時)"
+                // 如果找到熱點，只顯示起始時間 + "(1小時)"
                 if (peakHour24 !== null) {
                     peakHour = `${hourTo12hDisplay(peakHour24)} (1小時)`;
                 }
@@ -385,7 +438,7 @@
         };
 
         const renderTypeChart = (data) => {
-            // 【關鍵修正】修正 reduce 函數的箭頭函數語法
+            // 修正 reduce 函數的箭頭函數語法 (已修正)
             const typeCounts = data.reduce((acc, row) => { 
                 const type = row.type || '未知異味';
                 acc[type] = (acc[type] || 0) + 1;
@@ -418,7 +471,7 @@
         const renderTimeChart = (data) => {
             const hourCounts = Array(24).fill(0); // 0-23 小時
             
-            // 【修正處】優化 12 小時制標籤生成邏輯，確保 0 點是 12 AM，12 點是 12 PM
+            // 【修正】優化 12 小時制標籤生成邏輯，確保 0 點是 12 AM，12 點是 12 PM (來自前一次修正)
             const hours = Array.from({ length: 24 }, (_, i) => {
                 const hour = i;
                 let hour12;
@@ -439,22 +492,19 @@
                 }
                 return `${hour12}${suffix}`;
             });
-            // --- 標籤修正結束 ---
 
             data.forEach(row => {
-                if (row.time) {
-                    const timePart = row.time ? row.time.split(':') : null;
-                    const hour = timePart && timePart.length >= 2 ? parseInt(timePart[0], 10) : NaN;
-                    
-                    if (!isNaN(hour) && hour >= 0 && hour <= 23) {
-                        hourCounts[hour]++;
-                    }
+                // 【修正】直接使用預先計算好的 24 小時制小時數
+                const hour = row.hour24;
+                
+                if (!isNaN(hour) && hour >= 0 && hour <= 23) {
+                    hourCounts[hour]++;
                 }
             });
 
             initializeChart('timeChart', 'bar', {
                 data: {
-                    labels: hours, // 使用修正後的標籤
+                    labels: hours,
                     datasets: [{
                         label: '回報筆數',
                         data: hourCounts,
