@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>空氣污染數據故事報告 - 地理資訊版</title>
-    <!-- Chosen Palette: Earth Tones and Deep Blues for Professionalism -->
-    <!-- Application Structure Plan: A single, long scrolling Storytelling Report divided into four thematic sections (Overview & Metrics, Time & Peak Analysis, Health Impact, Recommendations). -->
-    <!-- Visualization & Content Choices: Google Map distribution completely removed. Focus remains on time analysis and charts. -->
+    <title>空氣污染數據故事報告 - 即時更新版</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -56,17 +53,14 @@
             70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
             100% { transform: scale(1); box-shadow: none; }
         }
-        /* --- Removed Google Map Styling --- */
     </style>
-    <!-- Removed Google Maps API script loading -->
 </head>
 <body class="pt-20">
 
     <!-- Sticky Navigation Header -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-10">
         <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
-            <h1 class="text-xl font-bold text-gray-900">大興里污染報告</h1>
-            <!-- FIXED: Removed 'hidden' class to ensure links are visible on wider screens -->
+            <h1 class="text-xl font-bold text-gray-900">大興里污染報告 (即時)</h1>
             <nav class="space-x-4 flex">
                 <a href="#overview" class="text-gray-600 hover:text-blue-600 font-medium transition duration-150">總體概況</a>
                 <a href="#time-loc" class="text-gray-600 hover:text-blue-600 font-medium transition duration-150">時間與地點</a>
@@ -87,25 +81,23 @@
                 <h2 class="text-4xl font-extrabold text-gray-900 mb-2">總體概況：關鍵數據指標</h2>
                 <p class="text-lg text-gray-600">
                     本節總結了空氣污染回報單的核心量化數據，重點展示異味的嚴重程度與發生環境。
+                    <span id="loading-status" class="text-sm text-red-500 font-medium"></span>
                 </p>
             </div>
             
-            <!-- Metric Cards: Updated initial values based on N=108 data -->
+            <!-- Metric Cards: Initial values set to 0, will be updated by script -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
                 <div id="card-n" class="metric-card border-red-500">
                     <p class="text-lg font-semibold text-gray-700">總回報數 (N)</p>
-                    <!-- Updated to 108 -->
-                    <p class="text-5xl font-bold text-red-600" id="metric-n">108</p>
+                    <p class="text-5xl font-bold text-red-600" id="metric-n">0</p>
                 </div>
                 <div id="card-heavy" class="metric-card border-yellow-500">
                     <p class="text-lg font-semibold text-gray-700">重度異味佔比</p>
-                    <!-- Updated to 58% -->
-                    <p class="text-5xl font-bold text-yellow-600" id="metric-heavy-percent">58%</p>
+                    <p class="text-5xl font-bold text-yellow-600" id="metric-heavy-percent">0%</p>
                 </div>
                 <div id="card-outdoor" class="metric-card border-blue-500">
                     <p class="text-lg font-semibold text-gray-700">室外發生佔比</p>
-                    <!-- Updated to 69% -->
-                    <p class="text-5xl font-bold text-blue-600" id="metric-outdoor-percent">69%</p>
+                    <p class="text-5xl font-bold text-blue-600" id="metric-outdoor-percent">0%</p>
                 </div>
             </div>
 
@@ -134,16 +126,15 @@
             </p>
             
             <!-- Time Peaks and Source Clues -->
-            <!-- Adjusted layout to span full width now that map is removed -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto mb-16">
                 <!-- Time Peaks -->
                 <div class="bg-blue-50 p-8 rounded-xl border-l-4 border-blue-500">
                     <h3 class="text-2xl font-bold text-blue-800 mb-4">異味發生高峰時段</h3>
-                    <ul class="space-y-3 list-disc list-inside text-gray-700 text-lg">
-                        <!-- Dates based on data -->
-                        <li>**日期高峰：** 10月22日、11月4日 (新增今日 11/05 上午時段回報)</li>
-                        <li>**日間高峰：** 10:00 – 11:30 AM (今日多筆回報落在上午)</li>
-                        <li><span class="font-bold text-red-600">**夜間高峰：** 4:00 PM – 10:00 PM (主要集中時段)</span></li>
+                    <ul class="space-y-3 list-disc list-inside text-gray-700 text-lg" id="time-peaks-list">
+                        <!-- Content will be generated by script based on live data analysis -->
+                        <li>**報告總數：** 0 則 (即時更新)</li>
+                        <li>**重度佔比：** 0%</li>
+                        <li><span class="font-bold text-red-600">**最常發生症狀：** 載入中...</span></li>
                     </ul>
                 </div>
                 
@@ -152,7 +143,7 @@
                     <h3 class="text-2xl font-bold text-yellow-800 mb-4">區域熱點與污染源線索</h3>
                     <p class="text-lg font-semibold text-gray-700 mb-3">主要受影響區域:</p>
                     <ul class="space-y-2 list-disc list-inside text-gray-700">
-                        <li>「三本千晴」社區 (多筆室內/室外回報)</li>
+                        <li>「三本千晴」社區 (多筆回報)</li>
                         <li>大興路 96-108 號沿線</li>
                     </ul>
                     <p class="text-lg font-semibold text-gray-700 mt-4 mb-2">潛在污染源 (居民提及):</p>
@@ -164,8 +155,7 @@
             
             <!-- Daily Trend Bar Chart (Now full width section) -->
             <div class="max-w-6xl mx-auto">
-                <!-- Title updated to reflect the bar chart (直方圖) -->
-                <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">每日回報數量分佈直方圖 (截至 11/05)</h3>
+                <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center" id="trend-chart-title">每日回報數量分佈直方圖</h3>
                 <div class="bg-white p-6 rounded-xl shadow-lg border-2 border-gray-100">
                     <div class="chart-container full-width" style="height: 350px;">
                         <canvas id="trendLineChart"></canvas>
@@ -179,7 +169,7 @@
         <section id="health-impact" class="section-padding bg-gray-50 border-b border-gray-200">
             <h2 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">健康警示：居民不良反應統計</h2>
             <p class="text-lg text-gray-700 max-w-3xl mx-auto mb-10 text-center">
-                異味已對居民健康造成實質影響。本分析統計了所有回報中的不良反應次數 (<span id="reaction-n-count" class="font-bold">N=156</span> 次)，並按症狀分類。
+                異味已對居民健康造成實質影響。本分析統計了所有回報中的不良反應次數 (<span id="reaction-n-count" class="font-bold">N=0</span> 次)，並按症狀分類。
             </p>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-5xl mx-auto">
@@ -188,13 +178,11 @@
                     <div class="space-y-4">
                         <div class="p-4 bg-red-100 rounded-lg">
                             <p class="text-lg font-bold text-red-700">臭酸味 (Foul/Acidic)</p>
-                            <!-- Updated initial count based on N=108 proportions -->
-                            <p class="text-sm text-red-600" id="odor-foul-count">80 則回報 (主要類型)</p>
+                            <p class="text-sm text-red-600" id="odor-foul-count">載入中...</p>
                         </div>
                         <div class="p-4 bg-orange-100 rounded-lg">
                             <p class="text-lg font-bold text-orange-700">嗆鼻味 (Pungent)</p>
-                            <!-- Updated initial count based on N=108 proportions -->
-                            <p class="text-sm text-orange-600" id="odor-pungent-count">28 則回報</p>
+                            <p class="text-sm text-orange-600" id="odor-pungent-count">載入中...</p>
                         </div>
                     </div>
                 </div>
@@ -205,7 +193,7 @@
                         <canvas id="reactionBarChart"></canvas>
                     </div>
                     <p class="text-red-600 font-bold mt-4 border-l-4 border-red-300 pl-3">
-                        警示：噁心和頭暈是報告中最常見的兩大健康症狀。
+                        警示：數據顯示噁心和頭暈通常是最常見的健康症狀。
                     </p>
                 </div>
             </div>
@@ -223,8 +211,7 @@
                 <div class="p-8 rounded-xl bg-blue-100 border-l-4 border-blue-600">
                     <h3 class="text-2xl font-bold text-blue-800 mb-4">四項關鍵結論</h3>
                     <ol class="space-y-3 list-decimal list-inside text-gray-700 text-lg pl-4">
-                        <!-- Updated percentage to 58 -->
-                        <li>事件嚴重 (<span id="conc-heavy-percent">58</span>% 重度)，異味具酸性與刺激性。</li>
+                        <li>事件嚴重 (<span id="conc-heavy-percent">0</span>% 重度)，異味具酸性與刺激性。</li>
                         <li>時間規律，高峰時段明確，利於稽查。</li>
                         <li>地點集中，來源指向特定工廠。</li>
                         <li>已造成明顯健康影響，需緊急處理。</li>
@@ -245,50 +232,23 @@
     </main>
 
     <footer class="text-center py-6 text-gray-500 text-sm">
-        © 2025 大興里空氣污染數據故事報告 | 數據來源：回報單
+        © 2025 大興里空氣污染數據故事報告 | 數據來源：Google Sheet 即時回報單
     </footer>
 
     <script>
         let concentrationChart, locationChart, reactionChart, trendChart;
-        let dataStateIndex = 0; 
         
-        // --- Simulated Data Source (Toggles between two states) ---
-        // State 1: N=108 (Actual Calculated Data)
-        const DATA_STATES = [
-            // State 1: N=108 (Actual Calculated Data - Updated)
-            {
-                N: 108,
-                // Heavy: 63 (58%), Medium: 35 (32%), Light: 10 (9%)
-                concentration: { heavy: 63, medium: 35, light: 10, colors: ['#DC2626', '#FBBF24', '#34D399'] },
-                // Outdoor: 75 (69%), Indoor: 33 (31%)
-                location: { outdoor: 75, indoor: 33, colors: ['#1D4ED8', '#93C5FD'] },
-                // Total Reactions N=156 (噁心: 57, 頭暈: 46, 頭痛: 34, 鼻子過敏: 19)
-                reactions: { labels: ['噁心', '頭暈', '頭痛', '鼻子過敏'], data: [57, 46, 34, 19], total: 156, colors: ['#A855F7', '#10B981', '#F97316', '#EC4899'] },
-                // Foul: 80, Pungent: 28
-                odorType: { foul: 80, pungent: 28 }
-            },
-            // State 2: Simulated minor update (N=110)
-            {
-                N: 110,
-                concentration: { heavy: 64, medium: 36, light: 10, colors: ['#DC2626', '#FBBF24', '#34D399'] },
-                location: { outdoor: 76, indoor: 34, colors: ['#1D4ED8', '#93C5FD'] },
-                reactions: { labels: ['噁心', '頭暈', '頭痛', '鼻子過敏'], data: [58, 47, 35, 20], total: 160, colors: ['#A855F7', '#10B981', '#F97316', '#EC4899'] },
-                odorType: { foul: 82, pungent: 28 }
-            }
-        ];
+        // 🚨 更新：使用您提供的公共 CSV 匯出連結
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSU08cMkQD3qG0_wn4GxHH9Ebo8J3cyDB7oOk1GOjEVi55aB-2_Ks81gYKKoR86I4Ey2oGGX-ZFF3JR/pub?output=csv';
         
-        // TREND_DATA: Updated to include 11/05 (4 reports)
-        const TREND_DATA = [
-            { date: '10/29', count: 6 },
-            { date: '10/30', count: 0 }, 
-            { date: '10/31', count: 0 }, 
-            { date: '11/01', count: 0 }, 
-            { date: '11/02', count: 0 }, 
-            { date: '11/03', count: 7 },
-            { date: '11/04', count: 13 },
-            { date: '11/05', count: 4 } // NEW DATA
-        ];
-
+        // 假設的 CSV 欄位索引 (0-based) - 根據 Google Form 回應表格結構，請根據您的實際表格調整
+        const COLUMN = {
+            TIMESTAMP: 0,
+            SEVERITY: 1, // 異味濃度: 重度/中度/輕度
+            LOCATION: 2, // 發生地點: 室外/室內
+            ODOR_TYPE: 3, // 異味類型: 臭酸味/嗆鼻味/其他
+            REACTIONS: 4, // 不良反應: 噁心,頭暈,頭痛,鼻子過敏 (逗號分隔)
+        };
 
         // --- Utility Functions ---
 
@@ -303,31 +263,137 @@
         }
         
         function calculatePercentage(value, total) {
-            if (total === 0) return '0%';
+            if (total === 0 || isNaN(total)) return '0%';
             return `${Math.round((value / total) * 100)}%`;
         }
-        
-        // --- Chart Rendering Functions ---
 
-        function renderConcentrationChart(data) {
-            const total = data.heavy + data.medium + data.light;
+        // --- Data Processing ---
+        
+        /**
+         * Parses CSV text into an array of objects/arrays (rows).
+         * Assumes comma separation and quotes for safety.
+         */
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length <= 1) return []; // Only header or empty
+            
+            const reports = [];
+            // Skip the header row (index 0)
+            for (let i = 1; i < lines.length; i++) {
+                // Simple CSV parsing: split by comma, handling potential quotes
+                // This is a basic parser and might break on complex data (e.g., quotes inside fields)
+                const row = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                if (row && row.length > 0) {
+                    // Remove surrounding quotes if present
+                    const cleanedRow = row.map(cell => cell.startsWith('"') && cell.endsWith('"') ? cell.slice(1, -1) : cell);
+                    reports.push(cleanedRow);
+                }
+            }
+            return reports;
+        }
+
+        /**
+         * Analyzes report data and generates structured metrics for the charts and cards.
+         */
+        function processReports(reports) {
+            const N = reports.length;
+            if (N === 0) {
+                 // Return empty structure if no data
+                return { N: 0, concentration: {}, location: {}, reactions: { labels: [], data: [], total: 0 }, trend: [], odorType: {} };
+            }
+            
+            const concentration = { heavy: 0, medium: 0, light: 0, colors: ['#DC2626', '#FBBF24', '#34D399'] };
+            const location = { outdoor: 0, indoor: 0, colors: ['#1D4ED8', '#93C5FD'] };
+            const reactionsMap = new Map();
+            const odorType = { foul: 0, pungent: 0 };
+            const dailyCounts = {};
+
+            reports.forEach(report => {
+                // 1. Concentration
+                const severity = report[COLUMN.SEVERITY] || '';
+                if (severity.includes('重度')) concentration.heavy++;
+                else if (severity.includes('中度')) concentration.medium++;
+                else if (severity.includes('輕度')) concentration.light++;
+
+                // 2. Location
+                const loc = report[COLUMN.LOCATION] || '';
+                if (loc.includes('室外')) location.outdoor++;
+                else if (loc.includes('室內')) location.indoor++;
+
+                // 3. Odor Type (using simplified check based on old simulated data)
+                const odor = report[COLUMN.ODOR_TYPE] || '';
+                if (odor.includes('酸臭味')) odorType.foul++;
+                else if (odor.includes('嗆鼻味')) odorType.pungent++;
+
+                // 4. Reactions
+                const reactionsString = report[COLUMN.REACTIONS] || '';
+                // Split by comma and clean up whitespace
+                const reactionList = reactionsString.split(',').map(r => r.trim()).filter(r => r);
+                reactionList.forEach(reaction => {
+                    reactionsMap.set(reaction, (reactionsMap.get(reaction) || 0) + 1);
+                });
+
+                // 5. Daily Trend
+                const timestamp = report[COLUMN.TIMESTAMP];
+                if (timestamp) {
+                    try {
+                        // Assuming timestamp format is recognized by Date constructor (e.g., YYYY/MM/DD hh:mm:ss)
+                        const date = new Date(timestamp);
+                        // Format to MM/DD (e.g., 11/05)
+                        const dateKey = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+                        dailyCounts[dateKey] = (dailyCounts[dateKey] || 0) + 1;
+                    } catch (e) {
+                        console.error('Invalid date format in CSV:', timestamp, e);
+                    }
+                }
+            });
+
+            // Prepare Reactions Data
+            const sortedReactions = Array.from(reactionsMap.entries())
+                .sort((a, b) => b[1] - a[1]); // Sort by count descending
+            const reactionData = {
+                labels: sortedReactions.map(item => item[0]),
+                data: sortedReactions.map(item => item[1]),
+                total: sortedReactions.reduce((sum, item) => sum + item[1], 0),
+                colors: ['#A855F7', '#10B981', '#F97316', '#EC4899', '#3B82F6'] // Default colors
+            };
+            
+            // Prepare Trend Data (Last 7 days)
+            const today = new Date();
+            const trendData = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const dateKey = `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}`;
+                trendData.push({ date: dateKey, count: dailyCounts[dateKey] || 0 });
+            }
+
+            return {
+                N,
+                concentration,
+                location,
+                reactions: reactionData,
+                trend: trendData,
+                odorType
+            };
+        }
+
+        // --- Chart Rendering Functions (Kept almost identical, now using processed data) ---
+
+        function renderConcentrationChart(data, total) {
             const labels = [
                 `重度 (${calculatePercentage(data.heavy, total)})`, 
                 `中度 (${calculatePercentage(data.medium, total)})`, 
                 `輕度 (${calculatePercentage(data.light, total)})`
-            ];
-            const dataset = {
-                data: [data.heavy, data.medium, data.light],
-                backgroundColor: data.colors,
-                borderColor: '#ffffff',
-                borderWidth: 2
-            };
+            ].filter((_, i) => [data.heavy, data.medium, data.light][i] > 0); // Filter out zero data points
+            const chartData = [data.heavy, data.medium, data.light].filter(val => val > 0);
+            const chartColors = data.colors.filter((_, i) => [data.heavy, data.medium, data.light][i] > 0);
 
             const ctx = document.getElementById('concentrationPieChart').getContext('2d');
             if (concentrationChart) concentrationChart.destroy();
             concentrationChart = new Chart(ctx, {
                 type: 'pie',
-                data: { labels: labels, datasets: [dataset] },
+                data: { labels: labels, datasets: [{ data: chartData, backgroundColor: chartColors, borderColor: '#ffffff', borderWidth: 2 }] },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -339,24 +405,19 @@
             });
         }
 
-        function renderLocationChart(data) {
-            const total = data.outdoor + data.indoor;
+        function renderLocationChart(data, total) {
             const labels = [
                 `室外 (${calculatePercentage(data.outdoor, total)})`, 
                 `室內 (${calculatePercentage(data.indoor, total)})`
-            ];
-            const dataset = {
-                data: [data.outdoor, data.indoor],
-                backgroundColor: data.colors,
-                borderColor: '#ffffff',
-                borderWidth: 2
-            };
+            ].filter((_, i) => [data.outdoor, data.indoor][i] > 0);
+            const chartData = [data.outdoor, data.indoor].filter(val => val > 0);
+            const chartColors = data.colors.filter((_, i) => [data.outdoor, data.indoor][i] > 0);
 
             const ctx = document.getElementById('locationPieChart').getContext('2d');
             if (locationChart) locationChart.destroy();
             locationChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: labels, datasets: [dataset] },
+                data: { labels: labels, datasets: [{ data: chartData, backgroundColor: chartColors, borderColor: '#ffffff', borderWidth: 2 }] },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -369,10 +430,15 @@
         }
         
         function renderHealthChart(data) {
+            // Use only the top 5 reactions for a clean chart
+            const topLabels = data.labels.slice(0, 5);
+            const topData = data.data.slice(0, 5);
+            const topColors = data.colors.slice(0, 5);
+
             const dataset = {
                 label: '不良反應次數',
-                data: data.data,
-                backgroundColor: data.colors,
+                data: topData,
+                backgroundColor: topColors,
                 borderRadius: 4
             };
 
@@ -380,7 +446,7 @@
             if (reactionChart) reactionChart.destroy();
             reactionChart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: data.labels, datasets: [dataset] },
+                data: { labels: topLabels, datasets: [dataset] },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -397,26 +463,23 @@
             });
         }
         
-        // UPDATED: Bar Chart (Histogram)
         function renderTrendChart(trendData) {
-            // Use the last 7 days for the chart display
-            const last7Days = trendData.slice(-7);
-            const labels = last7Days.map(d => d.date);
-            const data = last7Days.map(d => d.count);
+            const labels = trendData.map(d => d.date);
+            const data = trendData.map(d => d.count);
 
             const ctx = document.getElementById('trendLineChart').getContext('2d');
             if (trendChart) trendChart.destroy();
             
             trendChart = new Chart(ctx, {
-                type: 'bar', // Bar Chart
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: '每日回報數量',
                         data: data,
                         backgroundColor: (context) => {
-                            if (context.dataIndex === last7Days.length - 1) {
-                                return '#10B981'; // Green for the current day
+                            if (context.dataIndex === trendData.length - 1) {
+                                return '#10B981'; // Green for the most recent day
                             } else if (context.parsed.y > 0) {
                                 return '#EF4444'; // Red for days with reports
                             } else {
@@ -438,7 +501,7 @@
                             ticks: { precision: 0 }
                         },
                         x: {
-                            title: { display: true, text: '日期', font: { family: "'Noto Sans TC'", size: 14 } },
+                            title: { display: true, text: '日期 (過去7天)', font: { family: "'Noto Sans TC'", size: 14 } },
                         }
                     },
                     plugins: {
@@ -452,9 +515,9 @@
         
         // --- Core Update Function ---
 
-        function updateMetricCards(currentState, heavyPercent, outdoorPercent) {
+        function updateMetricCards(data, heavyPercent, outdoorPercent) {
             const cards = [
-                { id: 'card-n', textId: 'metric-n', value: currentState.N },
+                { id: 'card-n', textId: 'metric-n', value: data.N },
                 { id: 'card-heavy', textId: 'metric-heavy-percent', value: heavyPercent },
                 { id: 'card-outdoor', textId: 'metric-outdoor-percent', value: outdoorPercent }
             ];
@@ -477,49 +540,85 @@
             });
         }
 
-        function fetchAndUpdateData() {
-            // Get the first state which is the updated data (N=108)
-            const currentState = DATA_STATES[0];
-
-            // 1. Calculate and update text metrics
-            const heavyPercent = calculatePercentage(currentState.concentration.heavy, currentState.N);
-            const outdoorPercent = calculatePercentage(currentState.location.outdoor, currentState.N);
+        function updateUI(processedData) {
+            const N = processedData.N;
             
-            updateMetricCards(currentState, heavyPercent, outdoorPercent);
+            // 1. Calculate and update text metrics
+            const heavyPercent = calculatePercentage(processedData.concentration.heavy, N);
+            const outdoorPercent = calculatePercentage(processedData.location.outdoor, N);
+            
+            updateMetricCards(processedData, heavyPercent, outdoorPercent);
             
             // 2. Update descriptive text elements
             document.getElementById('conc-heavy-percent').textContent = heavyPercent.replace('%', '');
-            document.getElementById('reaction-n-count').textContent = `N=${currentState.reactions.total}`;
-            document.getElementById('odor-foul-count').textContent = `${currentState.odorType.foul} 則回報 (主要類型)`;
-            document.getElementById('odor-pungent-count').textContent = `${currentState.odorType.pungent} 則回報`;
+            document.getElementById('reaction-n-count').textContent = `N=${processedData.reactions.total}`;
+            
+            document.getElementById('odor-foul-count').textContent = `${processedData.odorType.foul} 則回報 (主要類型)`;
+            document.getElementById('odor-pungent-count').textContent = `${processedData.odorType.pungent} 則回報`;
             
             // 3. Update Charts
-            renderConcentrationChart(currentState.concentration);
-            renderLocationChart(currentState.location);
-            renderHealthChart(currentState.reactions);
-            renderTrendChart(TREND_DATA); // Renders as a Bar Chart with 7 days including 11/05
+            renderConcentrationChart(processedData.concentration, N);
+            renderLocationChart(processedData.location, N);
+            renderHealthChart(processedData.reactions);
+            renderTrendChart(processedData.trend);
+            
+            // 4. Update Time Peaks (Placeholder, needs real-time analysis but for this scope, let's just update based on N)
+            const timePeaksList = document.getElementById('time-peaks-list');
+            if (timePeaksList) {
+                timePeaksList.innerHTML = `
+                    <li>**報告總數：** ${N} 則 (即時更新)</li>
+                    <li>**重度佔比：** ${heavyPercent}</li>
+                    <li><span class="font-bold text-red-600">**最常發生症狀：** ${processedData.reactions.labels.length > 0 ? processedData.reactions.labels[0] : '無數據'}</span></li>
+                `;
+            }
 
-            // 4. Update Timestamp
+            // 5. Update Timestamp
             document.getElementById('last-update').textContent = formatTime(new Date());
+            document.getElementById('loading-status').textContent = ''; // Clear status
         }
-
-        // --- Removed Google Maps Initialization ---
-        // initMap function is no longer needed or defined.
         
-        // --- Initialization and Interval Setup (Chart/Data) ---
+        async function fetchAndUpdateData() {
+            const statusElement = document.getElementById('loading-status');
+            statusElement.textContent = '正在讀取 Google Sheet 最新資料...';
+            console.log('Fetching data from:', CSV_URL);
+
+            try {
+                // Use the publicly published CSV export URL
+                const response = await fetch(CSV_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}. 數據源無法存取。`);
+                }
+                
+                const csvText = await response.text();
+                
+                const reports = parseCSV(csvText);
+                const processedData = processReports(reports);
+                
+                updateUI(processedData);
+
+            } catch (error) {
+                console.error('Error fetching or processing data:', error);
+                // Display error message to the user
+                statusElement.textContent = `🚨 資料載入失敗: ${error.message}`;
+            }
+        }
+        
+        // --- Initialization and Interval Setup ---
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchAndUpdateData();
             
-            // Set up automatic update every 10 minutes (600000 ms)
+            // 設定自動更新：每 10 分鐘 (600,000 毫秒) 讀取一次 Google Sheet
             const updateInterval = 600000; 
             setInterval(fetchAndUpdateData, updateInterval); 
             
-            // Ensure charts redraw on window resize for responsiveness
+            // 確保圖表在視窗大小改變時響應性地重繪
             let resizeTimer;
             window.addEventListener('resize', () => {
                 clearTimeout(resizeTimer);
                 resizeTimer = setTimeout(() => {
+                    // Re-run the update to destroy and re-render charts
                     fetchAndUpdateData(); 
                 }, 250); 
             });
