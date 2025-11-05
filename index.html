@@ -183,14 +183,47 @@
             errorText.textContent = '';
         };
 
-        // Helper to format Date object to YYYY/MM/DD string for comparison
+        // Helper to format Date object to YYYY/MM/DD string for comparison (consistent key format)
         const formatDateKey = (date) => {
             const y = date.getFullYear();
             const m = (date.getMonth() + 1).toString().padStart(2, '0');
             const d = date.getDate().toString().padStart(2, '0');
-            // 根據 Google 表單的日期格式，通常是 YYYY/MM/DD 或 YYYY-MM-DD。這裡我們使用 YYYY/MM/DD 進行匹配。
             return `${y}/${m}/${d}`; 
         };
+        
+        // 【關鍵修正】日期字串標準化函數：將各種格式的日期字串轉換為 YYYY/MM/DD 格式
+        const normalizeDate = (dateString) => {
+            if (!dateString) return null;
+            
+            // 1. 移除時間部分（如果存在），只保留日期
+            let datePart = dateString.split(' ')[0];
+            
+            // 2. 嘗試解析 M/D/YYYY, YYYY/M/D, 或 M-D-YYYY 等格式
+            const parts = datePart.split(/[-\/]/).map(p => p.trim());
+            
+            if (parts.length === 3) {
+                let year, month, day;
+                
+                // 簡易啟發式判斷：如果第一部分是四位數，則假設為 YYYY/MM/DD
+                if (parts[0].length === 4) { 
+                    year = parts[0];
+                    month = parts[1];
+                    day = parts[2];
+                } else if (parts[2].length === 4) { // 假設為 MM/DD/YYYY 或 DD/MM/YYYY
+                    year = parts[2];
+                    month = parts[0]; // 假設月份是第一部分
+                    day = parts[1];
+                } else {
+                    return dateString; // 無法可靠解析，返回原始字串
+                }
+
+                // 處理月份和日期，確保兩位數
+                return `${year}/${month.padStart(2, '0')}/${day.padStart(2, '0')}`;
+            }
+
+            return dateString; // 解析失敗，返回原始字串
+        };
+
 
         // --- 資料獲取與解析 (使用 PapaParse) ---
         const fetchData = async () => {
@@ -236,7 +269,8 @@
                             rawData = data
                                 .map(row => {
                                     // 使用動態找到的 key 來提取數據並清除前後空格
-                                    const date = row[dateKey] ? String(row[dateKey]).trim() : null;
+                                    const rawDate = row[dateKey] ? String(row[dateKey]).trim() : null;
+                                    const date = normalizeDate(rawDate); // 【應用修正】標準化日期格式
                                     const time = row[timeKey] ? String(row[timeKey]).trim() : null;
                                     const location = row[locationKey] ? String(row[locationKey]).trim() : null;
                                     const concentration = row[concentrationKey] ? String(row[concentrationKey]).trim() : null;
@@ -295,7 +329,7 @@
 
             const heavyRatio = totalCount > 0 ? ((heavyReports / totalCount) * 100).toFixed(1) : 0;
 
-            // 【新功能】12小時制時間格式化 helper
+            // 12小時制時間格式化 helper
             const hourTo12hDisplay = (h24) => {
                 const hour = parseInt(h24, 10);
                 const suffix = hour >= 12 ? ' PM' : ' AM';
@@ -324,7 +358,7 @@
                     // 將小時轉為數字後加 1，並處理 23 -> 0 的情況
                     const nextHourInt = (parseInt(hour, 10) + 1) % 24;
                     
-                    // 【KPI修改】使用 12 小時制顯示時段
+                    // 使用 12 小時制顯示時段
                     peakHour = `${hourTo12hDisplay(hour)} - ${hourTo12hDisplay(nextHourInt)}`;
                 }
             });
@@ -352,7 +386,7 @@
         };
 
         const renderTypeChart = (data) => {
-            const typeCounts = data.reduce((acc, row) => {
+            const typeCounts = data.reduce((acc, row => {
                 const type = row.type || '未知異味';
                 acc[type] = (acc[type] || 0) + 1;
                 return acc;
@@ -384,7 +418,7 @@
         const renderTimeChart = (data) => {
             const hourCounts = Array(24).fill(0); // 0-23 小時
             
-            // 【圖表修改】生成 12 小時制標籤：12AM, 1AM, ..., 11PM
+            // 生成 12 小時制標籤：12AM, 1AM, ..., 11PM
             const hours = Array.from({ length: 24 }, (_, i) => {
                 const hour = i;
                 const suffix = hour >= 12 ? ' PM' : ' AM';
@@ -488,13 +522,14 @@
                 const label = `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}`;
                 dateLabels.push(label);
                 
-                // 產生資料比對鍵 (年/月/日)
+                // 產生資料比對鍵 (年/月/日) - 與 normalized data 格式一致
                 dateKeys.push(formatDateKey(d));
             }
             
             // 2. 計算過去 7 天的回報筆數
             const counts = dateKeys.map(key => {
-                return data.filter(row => row.date === key).length;
+                // 這裡 row.date 已經是 normalized (YYYY/MM/DD) 格式
+                return data.filter(row => row.date === key).length; 
             });
 
             // 3. 繪製折線圖
