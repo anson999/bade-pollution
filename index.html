@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大興里空氣異味監測與分析報告</title>
-    <!-- 載入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 載入 Chart.js (用於圖表繪製) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <!-- 載入 PapaParse (用於快速解析 CSV) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         /* 使用 Inter 字體 */
@@ -23,7 +20,6 @@
 <body class="bg-gray-50 min-h-screen p-4 sm:p-8">
 
     <div class="max-w-7xl mx-auto">
-        <!-- 標題與更新時間 -->
         <header class="text-center mb-8">
             <h1 class="text-4xl font-extrabold text-blue-700 tracking-tight mb-2">
                 大興里空氣異味監測與分析報告
@@ -33,30 +29,25 @@
             </p>
         </header>
         
-        <!-- 錯誤訊息顯示區 (新增) -->
         <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
             <strong class="font-bold">資料載入錯誤：</strong>
             <span id="error-text" class="block sm:inline"></span>
         </div>
 
-        <!-- 全域篩選器區 -->
         <section class="bg-white p-6 rounded-xl shadow-lg mb-8 transition-shadow duration-300 hover:shadow-xl">
             <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
                 篩選條件
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- 地點篩選器 -->
                 <div>
                     <label for="location-filter" class="block text-sm font-medium text-gray-700 mb-1">
                         發生位置
                     </label>
                     <select id="location-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150">
                         <option value="all">所有地點</option>
-                        <!-- 選項將由 JS 動態載入 -->
-                    </select>
+                        </select>
                 </div>
 
-                <!-- 濃度篩選器 -->
                 <div>
                     <label for="concentration-filter" class="block text-sm font-medium text-gray-700 mb-1">
                         氣味濃度
@@ -69,7 +60,6 @@
                     </select>
                 </div>
 
-                <!-- 重設按鈕 -->
                 <div class="flex items-end">
                     <button id="reset-button" class="w-full bg-indigo-500 text-white p-2 rounded-lg font-medium hover:bg-indigo-600 transition duration-200 shadow-md">
                         重設篩選
@@ -78,33 +68,26 @@
             </div>
         </section>
 
-        <!-- 關鍵數據指標 (KPIs) -->
         <section class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- 總回報筆數 -->
             <div class="bg-white p-5 rounded-xl shadow-md border-b-4 border-blue-500">
                 <p class="text-sm font-medium text-gray-500">總回報筆數</p>
                 <p id="kpi-total" class="text-3xl font-bold text-gray-900 mt-1">0</p>
             </div>
-            <!-- 發生異味天數 -->
             <div class="bg-white p-5 rounded-xl shadow-md border-b-4 border-green-500">
                 <p class="text-sm font-medium text-gray-500">發生異味天數</p>
                 <p id="kpi-days" class="text-3xl font-bold text-gray-900 mt-1">0</p>
             </div>
-            <!-- 最高濃度回報比例 -->
             <div class="bg-white p-5 rounded-xl shadow-md border-b-4 border-red-500">
                 <p class="text-sm font-medium text-gray-500">重度回報比例</p>
                 <p id="kpi-heavy-ratio" class="text-3xl font-bold text-gray-900 mt-1">0%</p>
             </div>
-            <!-- 最常發生時段 -->
             <div class="bg-white p-5 rounded-xl shadow-md border-b-4 border-yellow-500">
                 <p class="text-sm font-medium text-gray-500">最常發生時段</p>
                 <p id="kpi-peak-time" class="text-2xl font-bold text-gray-900 mt-2">--</p>
             </div>
         </section>
 
-        <!-- 圖表區 -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- 1. 污染類型佔比 (圓餅圖) -->
             <div class="bg-white p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
                 <h3 class="text-lg font-semibold text-gray-700 mb-4">污染類型佔比</h3>
                 <div class="chart-container">
@@ -112,7 +95,6 @@
                 </div>
             </div>
 
-            <!-- 2. 地點與濃度交叉分析 (長條圖) -->
             <div class="bg-white p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
                 <h3 class="text-lg font-semibold text-gray-700 mb-4">地點與濃度交叉分析</h3>
                 <div class="chart-container">
@@ -120,7 +102,6 @@
                 </div>
             </div>
 
-            <!-- 3. 異味發生熱點時段 (柱狀圖) -->
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
                 <h3 class="text-lg font-semibold text-gray-700 mb-4">異味發生熱點時段 (12小時制)</h3>
                 <div class="chart-container h-96">
@@ -128,17 +109,22 @@
                 </div>
             </div>
 
-            <!-- 4. 近七日回報紀錄趨勢 (折線圖) - NEW -->
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
                 <h3 class="text-lg font-semibold text-gray-700 mb-4">近七日回報紀錄趨勢</h3>
                 <div class="chart-container h-96">
                     <canvas id="weeklyTrendChart"></canvas>
                 </div>
             </div>
+            
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">近一個月回報紀錄趨勢</h3>
+                <div class="chart-container h-96">
+                    <canvas id="monthlyTrendChart"></canvas>
+                </div>
+            </div>
         </section>
     </div>
 
-    <!-- 載入中/錯誤訊息 -->
     <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
         <p class="text-white text-xl font-semibold">
             <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -224,7 +210,7 @@
             return dateString; // 解析失敗，返回原始字串
         };
 
-        // 【新修正】時間轉換函數：將 12 小時制 (如 3:00 PM) 或 24 小時制 (如 14:00) 轉換為 0-23 的小時整數
+        // 時間轉換函數：將 12 小時制 (如 3:00 PM) 或 24 小時制 (如 14:00) 轉換為 0-23 的小時整數
         const convertTo24Hour = (timeString) => {
             if (!timeString) return NaN;
             
@@ -310,7 +296,7 @@
                                     const concentration = row[concentrationKey] ? String(row[concentrationKey]).trim() : null;
                                     const type = row[typeKey] ? String(row[typeKey]).trim() : null;
                                     
-                                    // 【修正】在此處預先轉換為 24 小時制的小時數
+                                    // 在此處預先轉換為 24 小時制的小時數
                                     const hour24 = convertTo24Hour(time);
 
                                     return { date, time, location, concentration, type, hour24 };
@@ -395,7 +381,7 @@
             
             if (totalCount > 0) {
                 const hourCounts = data.reduce((acc, row) => {
-                    // 【修正】直接使用預先計算好的 24 小時制小時數
+                    // 直接使用預先計算好的 24 小時制小時數
                     const hour = row.hour24;
                     
                     if (!isNaN(hour)) {
@@ -438,7 +424,6 @@
         };
 
         const renderTypeChart = (data) => {
-            // 修正 reduce 函數的箭頭函數語法 (已修正)
             const typeCounts = data.reduce((acc, row) => { 
                 const type = row.type || '未知異味';
                 acc[type] = (acc[type] || 0) + 1;
@@ -471,7 +456,7 @@
         const renderTimeChart = (data) => {
             const hourCounts = Array(24).fill(0); // 0-23 小時
             
-            // 【修正】優化 12 小時制標籤生成邏輯，確保 0 點是 12 AM，12 點是 12 PM (來自前一次修正)
+            // 優化 12 小時制標籤生成邏輯
             const hours = Array.from({ length: 24 }, (_, i) => {
                 const hour = i;
                 let hour12;
@@ -494,7 +479,7 @@
             });
 
             data.forEach(row => {
-                // 【修正】直接使用預先計算好的 24 小時制小時數
+                // 直接使用預先計算好的 24 小時制小時數
                 const hour = row.hour24;
                 
                 if (!isNaN(hour) && hour >= 0 && hour <= 23) {
@@ -600,7 +585,6 @@
             
             // 2. 計算過去 7 天的回報筆數
             const counts = dateKeys.map(key => {
-                // 這裡 row.date 已經是 normalized (YYYY/MM/DD) 格式
                 return data.filter(row => row.date === key).length; 
             });
 
@@ -644,6 +628,74 @@
             });
         };
 
+        // 近一個月 (30天) 回報紀錄趨勢 (折線圖)
+        const renderMonthlyTrendChart = (data) => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            let dateLabels = []; // 標籤 (月/日)
+            let dateKeys = [];   // 資料比對鍵 (年/月/日)
+            
+            // 產生過去 30 天的日期列表 (從 29 天前到今天)
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                
+                const label = `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}`;
+                dateLabels.push(label);
+                
+                dateKeys.push(formatDateKey(d));
+            }
+            
+            // 計算過去 30 天的回報筆數
+            const counts = dateKeys.map(key => {
+                return data.filter(row => row.date === key).length; 
+            });
+
+            // 繪製折線圖
+            initializeChart('monthlyTrendChart', 'line', {
+                data: {
+                    labels: dateLabels,
+                    datasets: [{
+                        label: '回報筆數',
+                        data: counts,
+                        backgroundColor: 'rgba(16, 185, 129, 0.5)', // 綠色透明背景
+                        borderColor: '#10b981',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: '回報筆數' },
+                            ticks: { precision: 0 }
+                        },
+                        x: {
+                            title: { display: true, text: '日期' },
+                            // 調整刻度以避免 30 個標籤過於擁擠，大約每 5 天顯示一次
+                            ticks: {
+                                autoSkip: true,
+                                maxRotation: 0,
+                                minRotation: 0,
+                                maxTicksLimit: 7
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: false }
+                    }
+                }
+            });
+        };
+
 
         // --- 主渲染函數 ---
         const renderDashboard = (data) => {
@@ -652,6 +704,7 @@
             renderTimeChart(data);
             renderLocationConcentrationChart(data);
             renderWeeklyTrendChart(data); 
+            renderMonthlyTrendChart(data); 
         };
 
         // --- 初始化與事件監聽 ---
