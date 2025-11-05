@@ -418,13 +418,28 @@
         const renderTimeChart = (data) => {
             const hourCounts = Array(24).fill(0); // 0-23 小時
             
-            // 生成 12 小時制標籤：12AM, 1AM, ..., 11PM
+            // 【修正處】優化 12 小時制標籤生成邏輯，確保 0 點是 12 AM，12 點是 12 PM
             const hours = Array.from({ length: 24 }, (_, i) => {
                 const hour = i;
-                const suffix = hour >= 12 ? ' PM' : ' AM';
-                const hour12 = hour % 12 || 12; // 0點顯示為 12
+                let hour12;
+                let suffix;
+
+                if (hour === 0) {
+                    hour12 = 12;
+                    suffix = ' AM';
+                } else if (hour < 12) {
+                    hour12 = hour;
+                    suffix = ' AM';
+                } else if (hour === 12) {
+                    hour12 = 12;
+                    suffix = ' PM';
+                } else { // hour > 12
+                    hour12 = hour - 12;
+                    suffix = ' PM';
+                }
                 return `${hour12}${suffix}`;
             });
+            // --- 標籤修正結束 ---
 
             data.forEach(row => {
                 if (row.time) {
@@ -439,7 +454,7 @@
 
             initializeChart('timeChart', 'bar', {
                 data: {
-                    labels: hours,
+                    labels: hours, // 使用修正後的標籤
                     datasets: [{
                         label: '回報筆數',
                         data: hourCounts,
@@ -453,7 +468,14 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: { beginAtZero: true, title: { display: true, text: '回報筆數' } },
-                        x: { title: { display: true, text: '時間 (12小時制)' } } 
+                        x: { 
+                            title: { display: true, text: '時間 (12小時制)' },
+                            // 調整刻度，避免標籤過於擁擠
+                            ticks: {
+                                autoSkip: true,
+                                maxTicksLimit: 12 // 最多顯示 12 個刻度
+                            }
+                        } 
                     },
                     plugins: { legend: { display: false } }
                 }
