@@ -144,7 +144,6 @@
 
     <script>
         // 設定 CSV 資料來源 URL
-        // 已更新為使用者提供的正確連結
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSU08cMkQD3qG0_wn4GxHH9Ebo8J3cyDB7oOk1GOjEVi55aB-2_Ks81gYKKoR86I4Ey2oGGX-ZFF3JR/pub?output=csv';
 
         let rawData = []; // 儲存原始資料
@@ -196,31 +195,42 @@
                         },
                         complete: function(results) {
                             
-                            rawData = results.data
+                            const data = results.data;
+                            const fields = results.meta.fields || [];
+
+                            // Helper function to find the actual key in the row data based on a partial match (e.g., '發生日期')
+                            const findKey = (partialName) => fields.find(f => f && f.includes(partialName));
+
+                            // 識別關鍵欄位 (動態匹配，即使有隱藏字元也能找到)
+                            const dateKey = findKey('發生日期');
+                            const timeKey = findKey('發生時間');
+                            const locationKey = findKey('空氣異味確切發生位置');
+                            const concentrationKey = findKey('氣味濃度');
+                            const typeKey = findKey('空氣異味類型');
+                            
+                            // 檢查最關鍵的欄位是否找到
+                            if (!dateKey || !locationKey) {
+                                console.error("Critical headers not found:", fields);
+                                displayError(`CSV 檔案的關鍵欄位 ('發生日期' 或 '空氣異味確切發生位置') 不存在或無法辨識。`);
+                                resolve([]);
+                                return; 
+                            }
+
+                            rawData = data
                                 .map(row => {
-                                    // 確保欄位名稱正確對應 (現在 keys 已經被 transformHeader 清理過了)
-                                    // 注意：Google 表單導出的 CSV 第一個欄位通常是 '時間戳記'，但由於我們使用了 transformHeader
-                                    // 這裡可以直接使用我們預期的中文欄位名稱
-                                    const {
-                                        "發生日期": date,
-                                        "發生時間": time,
-                                        "空氣異味確切發生位置": location,
-                                        "氣味濃度": concentration,
-                                        "空氣異味類型": type,
-                                        ...rest
-                                    } = row;
-                                    return {
-                                        date: date ? date.trim() : null,
-                                        time: time ? time.trim() : null,
-                                        location: location ? location.trim() : null,
-                                        concentration: concentration ? concentration.trim() : null,
-                                        type: type ? type.trim() : null
-                                    };
+                                    // 使用動態找到的 key 來提取數據並清除前後空格
+                                    const date = row[dateKey] ? String(row[dateKey]).trim() : null;
+                                    const time = row[timeKey] ? String(row[timeKey]).trim() : null;
+                                    const location = row[locationKey] ? String(row[locationKey]).trim() : null;
+                                    const concentration = row[concentrationKey] ? String(row[concentrationKey]).trim() : null;
+                                    const type = row[typeKey] ? String(row[typeKey]).trim() : null;
+
+                                    return { date, time, location, concentration, type };
                                 })
                                 .filter(row => row.date && row.location); // 確保關鍵欄位有值
                             
                             if (rawData.length === 0) {
-                                displayError("資料已成功讀取，但未包含有效的回報數據。請檢查試算表內容。");
+                                displayError("資料已成功讀取，但未包含有效的回報數據。請檢查試算表內容是否至少有一筆完整的日期和位置資訊。");
                             }
 
                             resolve(rawData);
