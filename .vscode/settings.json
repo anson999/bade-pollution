@@ -12,5 +12,9 @@
       "approve": true,
       "matchCommandLine": true,
     },
+    "/^git add README\\.md app\\.js index\\.html styles\\.css test/app\\.test\\.js$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
   },
 }
