@@ -21,6 +21,8 @@ const ui = {
     lastUpdated: document.getElementById('last-updated'),
     errorMessage: document.getElementById('error-message'),
     errorText: document.getElementById('error-text'),
+    resultSummary: document.getElementById('result-summary'),
+    dataStatus: document.getElementById('data-status'),
 };
 
 const CHART_COLORS = {
@@ -308,6 +310,10 @@ const applyFilters = () => {
         return locationMatch && concentrationMatch && dateMatch;
     });
 
+    const total = state.rawData.length;
+    const visible = state.filteredData.length;
+    ui.resultSummary.textContent = `目前顯示 ${visible.toLocaleString()} / ${total.toLocaleString()} 筆回報`;
+    ui.dataStatus.textContent = visible ? '資料已更新' : '沒有符合條件的資料';
     renderDashboard(state.filteredData);
 };
 
@@ -380,15 +386,21 @@ const calculateKPIs = (data) => {
 };
 
 const initializeChart = (chartId, type, config) => {
-    if (state.charts[chartId]) {
-        state.charts[chartId].destroy();
+    const canvas = document.getElementById(chartId);
+    const existingChart = state.charts[chartId];
+    const nextOptions = { ...chartBaseOptions, ...(config.options || {}) };
+
+    if (existingChart) {
+        existingChart.data = config.data;
+        existingChart.options = nextOptions;
+        existingChart.update('none');
+        return;
     }
 
-    const canvas = document.getElementById(chartId);
     state.charts[chartId] = new Chart(canvas.getContext('2d'), {
         type,
-        options: { ...chartBaseOptions, ...(config.options || {}) },
-        ...config,
+        options: nextOptions,
+        data: config.data,
     });
 };
 
