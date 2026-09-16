@@ -1,0 +1,16 @@
+{
+  "chat.tools.terminal.autoApprove": {
+    "/^python3 -m http\\.server 4173$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
+    "/^cd /Users/ansonchang/bade-pollution && python3 -m http\\.server 4173$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
+    "/^node --test test/app\\.test\\.js$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
+  },
+}
