@@ -16,5 +16,8 @@
       "approve": true,
       "matchCommandLine": true,
     },
+    "true": true,
+    "/Users/ansonchang/.gemini/bin/agy": true,
+    "printf": true,
   },
 }
