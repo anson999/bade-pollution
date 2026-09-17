@@ -19,5 +19,6 @@
     "true": true,
     "/Users/ansonchang/.gemini/bin/agy": true,
     "printf": true,
+    "command": true,
   },
 }
