@@ -12,5 +12,13 @@
       "approve": true,
       "matchCommandLine": true,
     },
+    "/^git add README\\.md app\\.js index\\.html styles\\.css test/app\\.test\\.js$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
+    "true": true,
+    "/Users/ansonchang/.gemini/bin/agy": true,
+    "printf": true,
+    "command": true,
   },
 }
