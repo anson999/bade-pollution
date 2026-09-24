@@ -37,5 +37,9 @@
       "approve": true,
       "matchCommandLine": true,
     },
+    "/^git pull --rebase origin gemini-coder && git push origin HEAD$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
   },
 }
