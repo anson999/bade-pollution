@@ -23,6 +23,14 @@ Then open:
 http://localhost:8000/
 ```
 
+## Test
+
+Run the regression checks before committing:
+
+```bash
+node --test test/app.test.js
+```
+
 ## Files
 - `index.html` – page markup
 - `styles.css` – custom styling

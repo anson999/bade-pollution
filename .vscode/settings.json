@@ -20,5 +20,10 @@
     "/Users/ansonchang/.gemini/bin/agy": true,
     "printf": true,
     "command": true,
+    "git remote": true,
+    "/^git add app\\.js index\\.html && git commit -m \"Update pollution app UI and logic\" && git push origin HEAD$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
   },
 }

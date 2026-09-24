@@ -5,59 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>桃園市八德區大興里空氣異味監測與分析報告</title>
     <meta name="description" content="桃園市八德區大興里空氣異味監測與分析報告">
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 min-h-screen p-4 sm:p-8">
+<body>
 
-    <div class="max-w-7xl mx-auto">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold text-blue-700 tracking-tight mb-2">
+    <main class="app-shell">
+        <header class="page-header">
+            <div>
+                <p class="eyebrow">DA-XING AIR QUALITY MONITOR</p>
+                <h1>
                 八德區大興里空氣異味監測與分析報告
-            </h1>
-            <p id="last-updated" class="text-sm text-gray-500">
-                數據將在背景中每 10 分鐘自動更新。
-            </p>
+                </h1>
+                <p id="last-updated">資料將在背景中每 10 分鐘自動更新。</p>
+            </div>
+            <span id="data-status" class="status-chip">準備載入</span>
         </header>
 
-        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <strong class="font-bold">資料載入錯誤：</strong>
-            <span id="error-text" class="block sm:inline"></span>
+        <div id="error-message" class="message message-error hidden" role="alert">
+            <strong>資料載入錯誤：</strong>
+            <span id="error-text"></span>
         </div>
 
-        <section class="filter-panel card-surface p-6 rounded-xl mb-8 transition-shadow duration-300 hover:shadow-xl">
-            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4 border-b pb-2">
-                <h2 class="text-xl font-semibold text-gray-700">
-                    篩選條件
-                </h2>
-                <div class="flex flex-wrap gap-2">
-                    <button id="theme-toggle" type="button" class="bg-slate-700 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition duration-200 shadow-sm">
-                        深色模式
-                    </button>
-                    <button id="export-button" type="button" class="bg-emerald-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-emerald-600 transition duration-200 shadow-sm">
-                        匯出 CSV
-                    </button>
-                    <button id="print-button" type="button" class="bg-amber-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-amber-600 transition duration-200 shadow-sm">
-                        列印報表
-                    </button>
+        <section class="filter-panel card-surface">
+            <div class="section-heading">
+                <div>
+                    <p class="section-kicker">EXPLORE REPORTS</p>
+                    <h2>篩選條件</h2>
+                    <p class="section-help">縮小範圍，查看特定地點、濃度或日期的回報。</p>
+                </div>
+                <div class="action-row">
+                    <button id="theme-toggle" type="button" class="button button-secondary">深色模式</button>
+                    <button id="export-button" type="button" class="button button-secondary">匯出 CSV</button>
+                    <button id="print-button" type="button" class="button button-secondary">列印報表</button>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
+            <div class="filter-grid">
                 <div>
-                    <label for="location-filter" class="block text-sm font-medium text-gray-700 mb-1">
-                        發生位置
-                    </label>
+                    <label for="location-filter">發生位置</label>
                     <select id="location-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150">
                         <option value="all">所有地點</option>
                     </select>
                 </div>
 
                 <div>
-                    <label for="concentration-filter" class="block text-sm font-medium text-gray-700 mb-1">
-                        氣味濃度
-                    </label>
+                    <label for="concentration-filter">氣味濃度</label>
                     <select id="concentration-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150">
                         <option value="all">所有濃度</option>
                         <option value="重度">重度 (Heavy)</option>
@@ -67,86 +63,91 @@
                 </div>
 
                 <div>
-                    <label for="date-start" class="block text-sm font-medium text-gray-700 mb-1">
-                        起始日期
-                    </label>
+                    <label for="date-start">起始日期</label>
                     <input id="date-start" type="date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150">
                 </div>
 
                 <div>
-                    <label for="date-end" class="block text-sm font-medium text-gray-700 mb-1">
-                        結束日期
-                    </label>
+                    <label for="date-end">結束日期</label>
                     <input id="date-end" type="date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150">
                 </div>
 
-                <div class="flex items-end">
-                    <button id="reset-button" class="w-full bg-indigo-500 text-white p-2 rounded-lg font-medium hover:bg-indigo-600 transition duration-200 shadow-md">
+                <div class="filter-action">
+                    <button id="reset-button" class="button button-primary">
                         重設篩選
                     </button>
                 </div>
             </div>
         </section>
 
-        <section class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="stat-card card-surface p-5 border-b-4 border-blue-500">
-                <p class="text-sm font-medium text-gray-500">總回報筆數</p>
-                <p id="kpi-total" class="text-3xl font-bold text-gray-900 mt-1">0</p>
+        <div id="result-summary" class="result-summary" aria-live="polite">目前顯示 0 / 0 筆回報</div>
+
+        <section class="kpi-grid">
+            <div class="stat-card card-surface accent-blue">
+                <p>總回報筆數</p>
+                <strong id="kpi-total">0</strong>
             </div>
-            <div class="stat-card card-surface p-5 border-b-4 border-green-500">
-                <p class="text-sm font-medium text-gray-500">發生異味天數</p>
-                <p id="kpi-days" class="text-3xl font-bold text-gray-900 mt-1">0</p>
+            <div class="stat-card card-surface accent-green">
+                <p>發生異味天數</p>
+                <strong id="kpi-days">0</strong>
             </div>
-            <div class="stat-card card-surface p-5 border-b-4 border-red-500">
-                <p class="text-sm font-medium text-gray-500">重度回報比例</p>
-                <p id="kpi-heavy-ratio" class="text-3xl font-bold text-gray-900 mt-1">0%</p>
+            <div class="stat-card card-surface accent-red">
+                <p>重度回報比例</p>
+                <strong id="kpi-heavy-ratio">0%</strong>
             </div>
-            <div class="stat-card card-surface p-5 border-b-4 border-yellow-500">
-                <p class="text-sm font-medium text-gray-500">最常發生時段</p>
-                <p id="kpi-peak-time" class="text-2xl font-bold text-gray-900 mt-2">--</p>
+            <div class="stat-card card-surface accent-yellow">
+                <p>最常發生時段</p>
+                <strong id="kpi-peak-time">--</strong>
             </div>
         </section>
 
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="card-surface p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">污染類型佔比</h3>
+        <section class="chart-grid">
+            <div class="chart-card card-surface">
+                <h3>污染類型佔比</h3>
                 <div class="chart-container">
                     <canvas id="typeChart"></canvas>
                 </div>
             </div>
 
-            <div class="card-surface p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">地點與濃度交叉分析</h3>
+            <div class="chart-card card-surface">
+                <h3>地點與濃度交叉分析</h3>
                 <div class="chart-container">
                     <canvas id="locationConcentrationChart"></canvas>
                 </div>
             </div>
 
-            <div class="lg:col-span-2 card-surface p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">異味發生熱點時段 (12小時制)</h3>
+            <div class="chart-card chart-card-wide card-surface">
+                <h3>異味發生熱點時段 <span>(12 小時制)</span></h3>
                 <div class="chart-container h-96">
                     <canvas id="timeChart"></canvas>
                 </div>
             </div>
 
-            <div class="lg:col-span-2 card-surface p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">近七日回報紀錄趨勢</h3>
+            <div class="chart-card chart-card-wide card-surface">
+                <h3>近七日回報紀錄趨勢</h3>
                 <div class="chart-container h-96">
                     <canvas id="weeklyTrendChart"></canvas>
                 </div>
             </div>
 
-            <div class="lg:col-span-2 card-surface p-6 rounded-xl shadow-md transition-shadow duration-300 hover:shadow-xl">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">近一個月回報紀錄趨勢</h3>
+            <div class="chart-card chart-card-wide card-surface">
+                <h3>近一個月回報紀錄趨勢</h3>
                 <div class="chart-container h-96">
                     <canvas id="monthlyTrendChart"></canvas>
                 </div>
             </div>
-        </section>
-    </div>
 
-    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
-        <p class="text-white text-xl font-semibold">
+            <div class="chart-card chart-card-wide card-surface">
+                <h3>近一年回報統計紀錄趨勢 <span>(按月)</span></h3>
+                <div class="chart-container h-96">
+                    <canvas id="yearlyTrendChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="loading-overlay">
+        <p>
             <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
