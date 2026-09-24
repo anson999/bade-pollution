@@ -25,5 +25,17 @@
       "approve": true,
       "matchCommandLine": true,
     },
+    "/^cd /Users/ansonchang/bade-pollution && python3 - <<'PY'\nimport csv, io, urllib\\.request\nurl='https://docs\\.google\\.com/spreadsheets/d/e/2PACX-1vSU08cMkQD3qG0_wn4GxHH9Ebo8J3cyDB7oOk1GOjEVi55aB-2_Ks81gYKKoR86I4Ey2oGGX-ZFF3JR/pub\\?output=csv'\ntext=urllib\\.request\\.urlopen\\(url, timeout=30\\)\\.read\\(\\)\\.decode\\('utf-8-sig'\\)\nrows=list\\(csv\\.reader\\(io\\.StringIO\\(text\\)\\)\\)\nprint\\('rows', len\\(rows\\)\\)\nfor r in rows\\[:5\\]:\n    print\\(r\\)\nPY$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
+    "/^cd /Users/ansonchang/bade-pollution && python3 - <<'PY'\nimport csv, io, urllib\\.request\nfrom datetime import datetime\nurl='https://docs\\.google\\.com/spreadsheets/d/e/2PACX-1vSU08cMkQD3qG0_wn4GxHH9Ebo8J3cyDB7oOk1GOjEVi55aB-2_Ks81gYKKoR86I4Ey2oGGX-ZFF3JR/pub\\?output=csv'\ntext=urllib\\.request\\.urlopen\\(url, timeout=30\\)\\.read\\(\\)\\.decode\\('utf-8-sig'\\)\nrows=list\\(csv\\.DictReader\\(io\\.StringIO\\(text\\)\\)\\)\n# parse dates\nvalues=\\[\\]\nfor r in rows:\n    d=r\\.get\\('發生日期'\\)\n    if d:\n        s=d\\.strip\\(\\)\n        if '/' in s:\n            parts=s\\.split\\('/'\\)\n            if len\\(parts\\)==3:\n                try:\n                    if len\\(parts\\[0\\]\\)==4:\n                        dt=datetime\\.strptime\\(s,'%Y/%m/%d'\\)\n                    else:\n                        dt=datetime\\.strptime\\(s,'%m/%d/%Y'\\)\n                    values\\.append\\(dt\\)\n                except ValueError:\n                    pass\nprint\\('min', min\\(values\\), 'max', max\\(values\\), 'count', len\\(values\\)\\)\nfrom collections import Counter\nc=Counter\\(dt\\.strftime\\('%Y/%m'\\) for dt in values\\)\nfor k,v in sorted\\(c\\.items\\(\\)\\)\\[:5\\]:\n    print\\(k,v\\)\nfor k,v in sorted\\(c\\.items\\(\\)\\)\\[-5:\\]:\n    print\\(k,v\\)\nPY$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
+    "/^python3 -m http\\.server 8000$/": {
+      "approve": true,
+      "matchCommandLine": true,
+    },
   },
 }
