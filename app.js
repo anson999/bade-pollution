@@ -174,6 +174,32 @@ const buildDateSeries = (daysBack) => {
     return { labels, keys };
 };
 
+const buildMonthSeries = (monthsBack = 11) => {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth() - monthsBack, 1);
+
+    const labels = [];
+    const keys = [];
+
+    for (let offset = 0; offset <= monthsBack; offset += 1) {
+        const date = new Date(start.getFullYear(), start.getMonth() + offset, 1);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        labels.push(`${year}/${month}`);
+        keys.push(`${year}/${month}`);
+    }
+
+    return { labels, keys };
+};
+
+const getMonthKey = (dateString) => {
+    if (!dateString) return null;
+    const normalized = String(dateString).trim();
+    const [year, month] = normalized.split('/');
+    if (!year || !month) return null;
+    return `${year}/${String(month).padStart(2, '0')}`;
+};
+
 const countByKey = (data, getter) => {
     const counts = new Map();
     data.forEach((item) => {
@@ -559,6 +585,51 @@ const renderMonthlyTrendChart = (data) => {
     renderTrendChart('monthlyTrendChart', data, 29, 'rgba(16, 185, 129, 0.5)', '#10b981');
 };
 
+const renderYearlyTrendChart = (data) => {
+    const { labels, keys } = buildMonthSeries(11);
+    const counts = new Map(keys.map((key) => [key, 0]));
+
+    data.forEach((row) => {
+        const monthKey = getMonthKey(row.date);
+        if (monthKey && counts.has(monthKey)) {
+            counts.set(monthKey, counts.get(monthKey) + 1);
+        }
+    });
+
+    initializeChart('yearlyTrendChart', 'line', {
+        data: {
+            labels,
+            datasets: [{
+                label: '回報筆數',
+                data: keys.map((key) => counts.get(key) || 0),
+                backgroundColor: 'rgba(99, 102, 241, 0.45)',
+                borderColor: '#6366f1',
+                borderWidth: 3,
+                tension: 0.3,
+                fill: true,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: '回報筆數' },
+                    ticks: { precision: 0 },
+                },
+                x: { title: { display: true, text: '月份' } },
+            },
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: false },
+            },
+        },
+    });
+};
+
 const renderDashboard = (data) => {
     calculateKPIs(data);
     renderTypeChart(data);
@@ -566,6 +637,7 @@ const renderDashboard = (data) => {
     renderLocationConcentrationChart(data);
     renderWeeklyTrendChart(data);
     renderMonthlyTrendChart(data);
+    renderYearlyTrendChart(data);
 };
 
 const setupFilters = () => {
