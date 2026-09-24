@@ -22,3 +22,9 @@ test('chart updates reuse existing instances without destroying them', () => {
     assert.match(app, /existingChart\.update\('none'\);/);
     assert.doesNotMatch(app, /existingChart\.destroy\(\);/);
 });
+
+test('yearly trend uses the actual dataset month range instead of the current system date', () => {
+    assert.match(app, /buildMonthSeriesFromData\s*=/);
+    assert.match(app, /seriesStart\s*=\s*windowStart\s*<\s*dataStart\s*\?\s*dataStart\s*:\s*windowStart/);
+    assert.match(app, /renderYearlyTrendChart\s*=\s*\(data\)\s*=>[\s\S]*buildMonthSeriesFromData\(data, 11\)/);
+});

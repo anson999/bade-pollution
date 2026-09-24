@@ -192,6 +192,51 @@ const buildMonthSeries = (monthsBack = 11) => {
     return { labels, keys };
 };
 
+const buildMonthSeriesFromData = (data, monthsBack = 11) => {
+    const validDates = data
+        .map((row) => row.date)
+        .filter(Boolean)
+        .map((dateText) => {
+            const [year, month, day] = String(dateText).split('/').map((part) => part.trim());
+            const safeYear = Number(year || 0);
+            const safeMonth = Number(month || 1);
+            const safeDay = Number(day || 1);
+
+            if (!safeYear || !safeMonth) {
+                return null;
+            }
+
+            return new Date(safeYear, safeMonth - 1, safeDay);
+        })
+        .filter((date) => date instanceof Date && !Number.isNaN(date.getTime()));
+
+    if (!validDates.length) {
+        return buildMonthSeries(monthsBack);
+    }
+
+    const latestDate = new Date(Math.max(...validDates.map((date) => date.getTime())));
+    const earliestDate = new Date(Math.min(...validDates.map((date) => date.getTime())));
+
+    const anchorMonth = new Date(latestDate.getFullYear(), latestDate.getMonth(), 1);
+    const windowStart = new Date(anchorMonth.getFullYear(), anchorMonth.getMonth() - monthsBack, 1);
+    const dataStart = new Date(earliestDate.getFullYear(), earliestDate.getMonth(), 1);
+    const seriesStart = windowStart < dataStart ? dataStart : windowStart;
+
+    const labels = [];
+    const keys = [];
+    const end = new Date(anchorMonth.getFullYear(), anchorMonth.getMonth(), 1);
+
+    for (let current = new Date(seriesStart.getFullYear(), seriesStart.getMonth(), 1); current <= end; current.setMonth(current.getMonth() + 1)) {
+        const year = current.getFullYear();
+        const month = (current.getMonth() + 1).toString().padStart(2, '0');
+        const key = `${year}/${month}`;
+        labels.push(key);
+        keys.push(key);
+    }
+
+    return { labels, keys };
+};
+
 const getMonthKey = (dateString) => {
     if (!dateString) return null;
     const normalized = String(dateString).trim();
@@ -586,7 +631,7 @@ const renderMonthlyTrendChart = (data) => {
 };
 
 const renderYearlyTrendChart = (data) => {
-    const { labels, keys } = buildMonthSeries(11);
+    const { labels, keys } = buildMonthSeriesFromData(data, 11);
     const counts = new Map(keys.map((key) => [key, 0]));
 
     data.forEach((row) => {
